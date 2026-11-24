@@ -1,0 +1,128 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo | Catálogo de Livros</title>
+    <link rel="stylesheet" href="{% static 'catalogo/style.css' %}">
+</head>
+<body>
+
+<header class="cabecalho">
+    <h1>Acervo</h1>
+    <p>Explore nosso catálogo de livros</p>
+</header>
+
+<main class="container">
+
+    <section class="pesquisa">
+        <h2>Encontre seu próximo livro</h2>
+
+        <form method="GET" class="formulario">
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Pesquisar pelo título..."
+                value="{{ busca }}"
+            >
+
+            <select name="autor">
+                <option value="">Todos os autores</option>
+                {% for autor in autores %}
+                    <option value="{{ autor.id }}"
+                        {% if autor_selecionado == autor.id|stringformat:"s" %}
+                            selected
+                        {% endif %}>
+                        {{ autor.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="genero">
+                <option value="">Todos os gêneros</option>
+                {% for genero in generos %}
+                    <option value="{{ genero.id }}"
+                        {% if genero_selecionado == genero.id|stringformat:"s" %}
+                            selected
+                        {% endif %}>
+                        {{ genero.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Pesquisar</button>
+
+            <a href="{% url 'catalogo:listar_livros' %}">
+                Limpar filtros
+            </a>
+
+        </form>
+    </section>
+
+    <section class="resultados">
+
+        <h2>Livros disponíveis</h2>
+
+        <p class="quantidade">
+            {{ paginator.count }} livro(s) encontrado(s).
+        </p>
+
+        <div class="livros">
+
+            {% for livro in page_obj %}
+
+                <article class="livro">
+                    <h3>{{ livro.titulo }}</h3>
+
+                    <p><strong>Autor:</strong> {{ livro.autor.nome }}</p>
+
+                    <p><strong>Gênero:</strong> {{ livro.genero.nome }}</p>
+
+                    <p><strong>Ano:</strong> {{ livro.ano_publicacao }}</p>
+                </article>
+
+            {% empty %}
+
+                <p>Nenhum livro encontrado.</p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+    {% if paginator.num_pages > 1 %}
+
+    <nav class="paginacao">
+
+        {% if page_obj.has_previous %}
+            <a href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">
+                Próxima
+            </a>
+        {% endif %}
+
+    </nav>
+
+    {% endif %}
+
+</main>
+
+<footer>
+    <p>Acervo — Catálogo de Livros</p>
+</footer>
+
+</body>
+</html>
